@@ -1,1 +1,1 @@
-{"resolution": [64, 48], "numPixels": 300, "dim":0.3}
+{"resolution": [64, 48], "numPixels": 300, "dim": 0.3, "vis_list": ["gridder"]}
