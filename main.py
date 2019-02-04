@@ -12,40 +12,51 @@ import numbers
 #  ability to go into configure mode
 
 
-#register beanstalk listener
+# register beanstalk listener
 BS = Connection()
 
-#init the leds
+# init the leds
 led_control.init()
 
-#other globals
-VIS_CURRENT = gridder.go
-VIS_PARAMS = {"grid_size": 40}
+# other globals
+VIS_CURRENT = "gridder"
 VIS_LIST = {
-    "gridder": gridder.go
+    "gridder": gridder
 }
+VIS_PARAMS = settings.get(VIS_CURRENT, "params")
+if VIS_PARAMS is None:
+    VIS_PARAMS = VIS_LIST[VIS_CURRENT].getDefaultParams()
+    settings.set(VIS_CURRENT, "params", VIS_PARAMS)
+    lst = settings.get("core", "vis_list")
+    if lst is None:
+        lst = []
+    lst.append(VIS_CURRENT)
+    settings.set("core", "vis_list", list(set(lst)))
+    settings.set("custom", VIS_CURRENT, VIS_LIST[VIS_CURRENT].customParams())
 
-#change the state based on a connections
+
+# change the state based on a connections
 def process_event(msg):
     global VIS_CURRENT, VIS_PARAMS
-    if (not "action" in msg):
-         print("ERROR: No action")
-         return
-    if (not "params" in msg):
-         print("ERROR: No params")
-         return
+    if ("action" not in msg):
+        print("ERROR: No action")
+        return
+    if ("params" not in msg):
+        print("ERROR: No params")
+        return
     action = msg["action"]
     params = msg["params"]
     if ("setDim" == action):
-        if (isInstance(params, number.Number) and params <= 1 and params > 0):
-            settings.set("core","dim",params)
+        if (isInstance(params, numbers.Number) and params <= 1 and params > 0):
+            settings.set("core", "dim", params)
         else:
             print("ERROR: Can't dim to " + str(params))
     elif("setVis" == action):
         VIS_CURRENT = VIS_LIST[action]
         VIS_PARAMS = params
+    elif("configure" == action):
+        led_configuration.run_configuration()
 
-#main_loop
 def main_loop():
     global VIS_CURRENT, VIS_PARAMS
     job = BS.reserve(0)
