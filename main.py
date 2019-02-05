@@ -26,7 +26,7 @@ VIS_LIST = {
 VIS_PARAMS = settings.get(VIS_CURRENT, "params")
 if VIS_PARAMS is None:
     VIS_PARAMS = VIS_LIST[VIS_CURRENT].getDefaultParams()
-    settings.set(VIS_CURRENT, "params", VIS_PARAMS)
+    settings.create(VIS_CURRENT, VIS_PARAMS)
     lst = settings.get("core", "vis_list")
     if lst is None:
         lst = []

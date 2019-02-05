@@ -15,10 +15,20 @@ def getDataFile(domain):
 
 
 def set(domain, key, value):
+    print("SET:" + key + " => " + str(value))
+    global _DATA
+    if domain not in _DATA:
+        loadFromFile(domain)
+    _DATA[domain][key] = value
+    with open(getDataFile(domain), "w") as out:
+        json.dump(_DATA[domain], out)
+
+
+def create(domain, value):
     global _DATA
     if domain not in _DATA:
         _DATA[domain] = {}
-    _DATA[domain][key] = value
+    _DATA[domain] = value
     with open(getDataFile(domain), "w") as out:
         json.dump(_DATA[domain], out)
 
@@ -33,4 +43,13 @@ def get(domain, key):
             return None
         if key not in _DATA[domain]:
             return None
-        return _DATA[domain][key]
+    return _DATA[domain][key]
+
+
+def loadFromFile(domain):
+    global _DATA
+    if os.path.isfile(getDataFile(domain)):
+        with open(getDataFile(domain)) as infile:
+            _DATA[domain] = json.load(infile)
+    else:
+        _DATA[domain] = {}
