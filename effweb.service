@@ -1,0 +1,12 @@
+[Unit]
+Description=EFF Lights Config Webserver
+After=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/eff_led_lights
+ExecStart=/usr/bin/python3 /home/pi/eff_led_lights/server.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
