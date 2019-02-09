@@ -1,7 +1,7 @@
 import led_control
 import led_configuration
 import settings
-from vis import gridder
+from vis import gridder, starfall, noise
 from pystalkd.Beanstalkd import Connection
 import numbers
 import json
@@ -20,9 +20,11 @@ BS = Connection()
 led_control.init()
 
 # other globals
-VIS_CURRENT = "gridder"
+VIS_CURRENT = "noise"
 VIS_LIST = {
-    "gridder": gridder
+    "gridder": gridder,
+    "starfall": starfall,
+    "noise": noise,
 }
 VIS_PARAMS = settings.getAll(VIS_CURRENT)
 if VIS_PARAMS is None:
