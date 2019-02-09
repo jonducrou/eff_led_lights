@@ -4,6 +4,7 @@ import settings
 from vis import gridder
 from pystalkd.Beanstalkd import Connection
 import numbers
+import json
 
 # contains
 #  the main loop
@@ -23,7 +24,7 @@ VIS_CURRENT = "gridder"
 VIS_LIST = {
     "gridder": gridder
 }
-VIS_PARAMS = settings.get(VIS_CURRENT, "params")
+VIS_PARAMS = settings.getAll(VIS_CURRENT)
 if VIS_PARAMS is None:
     VIS_PARAMS = VIS_LIST[VIS_CURRENT].getDefaultParams()
     settings.create(VIS_CURRENT, VIS_PARAMS)
@@ -38,6 +39,7 @@ if VIS_PARAMS is None:
 # change the state based on a connections
 def process_event(msg):
     global VIS_CURRENT, VIS_PARAMS
+    print(msg)
     if ("action" not in msg):
         print("ERROR: No action")
         return
@@ -51,21 +53,22 @@ def process_event(msg):
             settings.set("core", "dim", params)
         else:
             print("ERROR: Can't dim to " + str(params))
-    elif("setVis" == action):
-        VIS_CURRENT = VIS_LIST[action]
-        VIS_PARAMS = params
+    elif("update" == action):
+        VIS_CURRENT = params
+        settings.loadFromFile(params)
+        VIS_PARAMS = settings.getAll(VIS_CURRENT)
     elif("configure" == action):
-        led_configuration.run_configuration()
+        led_configuration.run_configuration(led_control)
 
 def main_loop():
     global VIS_CURRENT, VIS_PARAMS
     job = BS.reserve(0)
     if (not job == None):
-        process_event(json.loads(job.body))
         job.delete()
+        process_event(json.loads(job.body))
 
     resolution = settings.get("core", "resolution")
-    VIS_CURRENT(VIS_PARAMS, resolution[0], resolution[1], led_control)
+    VIS_LIST[VIS_CURRENT].go(VIS_PARAMS, resolution[0], resolution[1], led_control)
     led_control.flush()
 
 while(True):

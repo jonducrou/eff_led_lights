@@ -57,6 +57,7 @@ def flush():
 
     base_str = 100
     pixels.show()
+    return
     print("\n\n\n\n\n\n")
     for x in range(w):
         for y in range(h):

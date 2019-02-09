@@ -1,15 +1,13 @@
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 import settings
-import led_control
 
 
-def run_configuration():
+def run_configuration(led_control):
     NUM_PIXELS = settings.get('core', 'numPixels')
     locations = []
     data = [None for i in range(NUM_PIXELS)]
     RESOLUTION = settings.get('core', 'resolution')
-    led_control.init()
     led_control.fill(0, 0, 0)
     led_control.flush()
     with PiCamera() as camera:
@@ -17,6 +15,7 @@ def run_configuration():
         with PiRGBArray(camera, size=RESOLUTION) as output:
             # for each pixel
             for i in range(NUM_PIXELS):
+                print(i)
                 camera.capture(output, 'rgb')
                 img0 = output.array
                 output.truncate(0)

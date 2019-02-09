@@ -45,6 +45,16 @@ def get(domain, key):
             return None
     return _DATA[domain][key]
 
+def getAll(domain):
+    global _DATA
+    if domain not in _DATA:
+        if os.path.isfile(getDataFile(domain)):
+            with open(getDataFile(domain)) as infile:
+                _DATA[domain] = json.load(infile)
+        else:
+            return None
+    return _DATA[domain]
+
 
 def loadFromFile(domain):
     global _DATA
